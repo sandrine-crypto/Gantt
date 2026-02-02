@@ -302,6 +302,17 @@ Packer.toBuffer(doc).then(b=>{fs.writeFileSync("output.docx",b);console.log("OK"
 
 def run_node(script, ext):
     with tempfile.TemporaryDirectory() as tmp:
+        # Créer package.json pour les dépendances locales
+        pkg = {"dependencies": {"pptxgenjs": "^3.12.0", "docx": "^8.2.0"}}
+        with open(os.path.join(tmp, "package.json"), "w") as f:
+            json.dump(pkg, f)
+        
+        # Installer les dépendances npm localement
+        try:
+            subprocess.run(["npm", "install", "--silent"], cwd=tmp, capture_output=True, timeout=120)
+        except:
+            pass
+        
         sf = os.path.join(tmp, "gen.js")
         of = os.path.join(tmp, f"output.{ext}")
         with open(sf, "w", encoding="utf-8") as f:
